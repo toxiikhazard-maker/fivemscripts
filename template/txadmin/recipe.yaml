@@ -1,10 +1,17 @@
 $engine: 3
 name: ZRP Extraction PvE Full Bootstrap (QBCore + ox_inventory)
 author: zrp
-version: 1.1
+version: 1.2
 description: txAdmin recipe that installs ZRP plus required core dependencies (qb-core, oxmysql, ox_lib, ox_inventory).
 
 variables:
+  - name: zrpRepoUrl
+    description: "ZRP repository URL (GitHub repo URL, not webpage with query params)"
+    default: "https://github.com/REPLACE_ME/REPLACE_REPO"
+  - name: zrpRepoRef
+    description: "ZRP git ref (branch/tag/commit)"
+    default: "main"
+
   - name: serverName
     description: "Server name used in server.cfg"
     default: "ZRP Extraction PvE"
@@ -38,30 +45,30 @@ tasks:
   - action: filePath
     path: ./tmp
 
-  # Download ZRP repository (this recipe source)
+  # Download ZRP repository (avoid {{self.*}} template parser issues)
   - action: downloadGitHub
-    src: "https://github.com/{{self.owner}}/{{self.repo}}"
-    ref: "{{self.branch}}"
+    src: "{{zrpRepoUrl}}"
+    ref: "{{zrpRepoRef}}"
     dest: ./tmp/zrp
 
   # Download required dependencies
   - action: downloadGitHub
-    src: https://github.com/qbcore-framework/qb-core
+    src: "https://github.com/qbcore-framework/qb-core"
     ref: "{{qbCoreRef}}"
     dest: ./tmp/qb-core
 
   - action: downloadGitHub
-    src: https://github.com/overextended/oxmysql
+    src: "https://github.com/overextended/oxmysql"
     ref: "{{oxmysqlRef}}"
     dest: ./tmp/oxmysql
 
   - action: downloadGitHub
-    src: https://github.com/overextended/ox_lib
+    src: "https://github.com/overextended/ox_lib"
     ref: "{{oxlibRef}}"
     dest: ./tmp/ox_lib
 
   - action: downloadGitHub
-    src: https://github.com/overextended/ox_inventory
+    src: "https://github.com/overextended/ox_inventory"
     ref: "{{oxInventoryRef}}"
     dest: ./tmp/ox_inventory
 
