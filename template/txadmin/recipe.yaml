@@ -1,0 +1,116 @@
+$engine: 3
+name: ZRP Extraction PvE Full Bootstrap (QBCore + ox_inventory)
+author: zrp
+version: 1.1
+description: txAdmin recipe that installs ZRP plus required core dependencies (qb-core, oxmysql, ox_lib, ox_inventory).
+
+variables:
+  - name: serverName
+    description: "Server name used in server.cfg"
+    default: "ZRP Extraction PvE"
+  - name: maxClients
+    description: "Max clients"
+    default: "32"
+  - name: steamWebApiKey
+    description: "Steam API key (optional if not using Steam auth)"
+    default: ""
+  - name: licenseKey
+    description: "FiveM license key"
+    default: "change_me"
+  - name: mysqlConnection
+    description: "oxmysql connection string"
+    default: "mysql://fivem:password@127.0.0.1/fivem?charset=utf8mb4"
+
+  - name: qbCoreRef
+    description: "qb-core git ref (branch/tag/commit)"
+    default: "main"
+  - name: oxmysqlRef
+    description: "oxmysql git ref (branch/tag/commit)"
+    default: "main"
+  - name: oxlibRef
+    description: "ox_lib git ref (branch/tag/commit)"
+    default: "master"
+  - name: oxInventoryRef
+    description: "ox_inventory git ref (branch/tag/commit)"
+    default: "main"
+
+tasks:
+  - action: filePath
+    path: ./tmp
+
+  # Download ZRP repository (this recipe source)
+  - action: downloadGitHub
+    src: https://github.com/{{self.owner}}/{{self.repo}}
+    ref: {{self.branch}}
+    dest: ./tmp/zrp
+
+  # Download required dependencies
+  - action: downloadGitHub
+    src: https://github.com/qbcore-framework/qb-core
+    ref: {{qbCoreRef}}
+    dest: ./tmp/qb-core
+
+  - action: downloadGitHub
+    src: https://github.com/overextended/oxmysql
+    ref: {{oxmysqlRef}}
+    dest: ./tmp/oxmysql
+
+  - action: downloadGitHub
+    src: https://github.com/overextended/ox_lib
+    ref: {{oxlibRef}}
+    dest: ./tmp/ox_lib
+
+  - action: downloadGitHub
+    src: https://github.com/overextended/ox_inventory
+    ref: {{oxInventoryRef}}
+    dest: ./tmp/ox_inventory
+
+  # Copy dependencies
+  - action: copyPath
+    src: ./tmp/qb-core
+    dest: ./resources/[core]/qb-core
+
+  - action: copyPath
+    src: ./tmp/oxmysql
+    dest: ./resources/[ox]/oxmysql
+
+  - action: copyPath
+    src: ./tmp/ox_lib
+    dest: ./resources/[ox]/ox_lib
+
+  - action: copyPath
+    src: ./tmp/ox_inventory
+    dest: ./resources/[ox]/ox_inventory
+
+  # Copy ZRP modules and SQL
+  - action: copyPath
+    src: ./tmp/zrp/resources/[zrp]
+    dest: ./resources/[zrp]
+
+  - action: copyPath
+    src: ./tmp/zrp/sql/zrp_schema.sql
+    dest: ./zrp_schema.sql
+
+  - action: copyPath
+    src: ./tmp/zrp/template/fxserver/server.cfg.template
+    dest: ./server.cfg
+
+  - action: replaceInFile
+    path: ./server.cfg
+    replacements:
+      - from: "{{SERVER_NAME}}"
+        to: "{{serverName}}"
+      - from: "{{MAX_CLIENTS}}"
+        to: "{{maxClients}}"
+      - from: "{{STEAM_WEB_API_KEY}}"
+        to: "{{steamWebApiKey}}"
+      - from: "{{LICENSE_KEY}}"
+        to: "{{licenseKey}}"
+      - from: "{{MYSQL_CONNECTION}}"
+        to: "{{mysqlConnection}}"
+
+  - action: queryDatabase
+    file: ./zrp_schema.sql
+
+  - action: removePath
+    path: ./tmp
