@@ -67,6 +67,23 @@ Then:
 2. Edit `/path/to/fxserver/server.cfg` (`sv_licenseKey`, admins, icon, endpoints)
 3. Start server.
 
+
+### txAdmin recipe URL notes (important)
+
+If txAdmin says `invalid yaml`, most often the URL is not the raw file.
+Use a **raw file URL** (not the GitHub HTML page).
+
+Recommended (root recipe):
+`https://raw.githubusercontent.com/<owner>/<repo>/<branch>/recipe.yaml`
+
+Alternative (same content):
+`https://raw.githubusercontent.com/<owner>/<repo>/<branch>/template/txadmin/recipe.yaml`
+
+
+When running the recipe, set:
+- `zrpRepoUrl` => `https://github.com/<owner>/<repo>`
+- `zrpRepoRef` => your branch/tag (for example `main`)
+
 ## Added Systems
 - **Weapon attachments**: weapon loot can roll random attachment metadata.
 - **Ammo types**: ammo loot rolls FMJ/AP/Incendiary/etc metadata with stat multipliers.
