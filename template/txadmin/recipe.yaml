@@ -40,29 +40,29 @@ tasks:
 
   # Download ZRP repository (this recipe source)
   - action: downloadGitHub
-    src: https://github.com/{{self.owner}}/{{self.repo}}
-    ref: {{self.branch}}
+    src: "https://github.com/{{self.owner}}/{{self.repo}}"
+    ref: "{{self.branch}}"
     dest: ./tmp/zrp
 
   # Download required dependencies
   - action: downloadGitHub
     src: https://github.com/qbcore-framework/qb-core
-    ref: {{qbCoreRef}}
+    ref: "{{qbCoreRef}}"
     dest: ./tmp/qb-core
 
   - action: downloadGitHub
     src: https://github.com/overextended/oxmysql
-    ref: {{oxmysqlRef}}
+    ref: "{{oxmysqlRef}}"
     dest: ./tmp/oxmysql
 
   - action: downloadGitHub
     src: https://github.com/overextended/ox_lib
-    ref: {{oxlibRef}}
+    ref: "{{oxlibRef}}"
     dest: ./tmp/ox_lib
 
   - action: downloadGitHub
     src: https://github.com/overextended/ox_inventory
-    ref: {{oxInventoryRef}}
+    ref: "{{oxInventoryRef}}"
     dest: ./tmp/ox_inventory
 
   # Copy dependencies
