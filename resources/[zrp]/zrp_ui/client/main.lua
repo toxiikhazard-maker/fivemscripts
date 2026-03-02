@@ -1,4 +1,5 @@
 local radialRegistered = false
+local vendorPeds = {}
 
 local function pickZoneAndContract(mode)
     local data = lib.callback.await('zrp_ui:server:getMenuData', false)
@@ -55,6 +56,44 @@ local function showCharacterRoster()
 
     lib.registerContext({ id = 'zrp_char_roster', title = 'Character Roster', options = opts })
     lib.showContext('zrp_char_roster')
+end
+
+local function openVendorMenu(vendor)
+    local stock = lib.callback.await('zrp_ui:server:getVendorStock', false, vendor.id)
+    if not stock then
+        TriggerEvent('zrp_core:client:notify', 'Vendor unavailable.', 'error')
+        return
+    end
+
+    local options = {}
+    for _, item in ipairs(stock.buy or {}) do
+        options[#options + 1] = {
+            title = ('Buy %sx %s'):format(item.amount or 1, item.item),
+            description = ('$%s'):format(item.price or 0),
+            icon = 'cart-shopping',
+            onSelect = function()
+                TriggerServerEvent('zrp_ui:server:vendorBuy', stock.id, item.item)
+            end
+        }
+    end
+
+    for _, item in ipairs(stock.sell or {}) do
+        options[#options + 1] = {
+            title = ('Sell %sx %s'):format(item.amount or 1, item.item),
+            description = ('$%s'):format(item.price or 0),
+            icon = 'money-bill-transfer',
+            onSelect = function()
+                TriggerServerEvent('zrp_ui:server:vendorSell', stock.id, item.item)
+            end
+        }
+    end
+
+    lib.registerContext({
+        id = 'zrp_vendor_menu',
+        title = stock.label or 'Vendor',
+        options = options
+    })
+    lib.showContext('zrp_vendor_menu')
 end
 
 local function registerRadial()
@@ -141,9 +180,82 @@ local function registerRadial()
     })
 end
 
+local function loadVendorPed(model)
+    local hash = joaat(model)
+    RequestModel(hash)
+    while not HasModelLoaded(hash) do Wait(0) end
+    return hash
+end
+
+local function spawnVendors()
+    for _, ped in ipairs(vendorPeds) do
+        if DoesEntityExist(ped) then DeleteEntity(ped) end
+    end
+    vendorPeds = {}
+
+    for _, vendor in ipairs(ZRPConfig.Hub.Vendors or {}) do
+        local hash = loadVendorPed(vendor.ped)
+        local ped = CreatePed(4, hash, vendor.coords.x, vendor.coords.y, vendor.coords.z - 1.0, vendor.coords.w or 0.0, false, true)
+        FreezeEntityPosition(ped, true)
+        SetEntityInvincible(ped, true)
+        SetBlockingOfNonTemporaryEvents(ped, true)
+        vendorPeds[#vendorPeds + 1] = ped
+    end
+end
+
 CreateThread(function()
     Wait(1000)
     registerRadial()
+    spawnVendors()
+end)
+
+CreateThread(function()
+    while true do
+        Wait(0)
+        local raid = exports['zrp_raids'] and exports['zrp_raids']:GetCurrentRaid() or nil
+        if not raid then
+            local ped = PlayerPedId()
+            local coords = GetEntityCoords(ped)
+            local safe = ZRPConfig.Hub.Safezone
+            local dist = #(coords - safe.center)
+
+            if dist <= safe.radius then
+                DrawMarker(1, safe.center.x, safe.center.y, safe.center.z - 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, safe.radius * 2.0, safe.radius * 2.0, 1.0, 40, 180, 255, 45, false, false, 2, false, nil, nil, false)
+                if safe.disableWeapons then
+                    DisablePlayerFiring(PlayerId(), true)
+                    DisableControlAction(0, 24, true)
+                    DisableControlAction(0, 25, true)
+                end
+                if safe.invincible then
+                    SetEntityInvincible(ped, true)
+                end
+            else
+                SetEntityInvincible(ped, false)
+            end
+
+            local near = false
+            for _, vendor in ipairs(ZRPConfig.Hub.Vendors or {}) do
+                local vPos = vec3(vendor.coords.x, vendor.coords.y, vendor.coords.z)
+                local vDist = #(coords - vPos)
+                if vDist < 20.0 then
+                    DrawMarker(2, vPos.x, vPos.y, vPos.z + 1.05, 0.0, 0.0, 0.0, 180.0, 0.0, 0.0, 0.18, 0.18, 0.18, 120, 220, 140, 220, false, false, 2, false, nil, nil, false)
+                end
+                if vDist <= (vendor.interactionDistance or 2.0) then
+                    near = true
+                    lib.showTextUI(('[E] Talk to %s'):format(vendor.label))
+                    if IsControlJustPressed(0, 38) then
+                        openVendorMenu(vendor)
+                    end
+                end
+            end
+
+            if not near then
+                lib.hideTextUI()
+            end
+        else
+            Wait(500)
+        end
+    end
 end)
 
 RegisterCommand('zrp_menu', function()

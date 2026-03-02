@@ -87,6 +87,9 @@ When running the recipe, set:
 - `zrpRepoRef` => your branch/tag (for example `main`)
 
 ## Added Systems
+- **Hub safezone + vendors**:
+  - Configured safezone in hub with weapon disable/invulnerability while inside.
+  - Two example vendors (Quartermaster + Medic Supplier) with buy/sell lists via ox_inventory + cash economy.
 - **Weapon attachments**: weapon loot can roll random attachment metadata.
 - **Ammo types**: ammo loot rolls FMJ/AP/Incendiary/etc metadata with stat multipliers.
 - **Armor and clothing perks**: armor/clothing items grant passive buffs (armor, sprint, mitigation).
@@ -103,7 +106,7 @@ When running the recipe, set:
 
 ## Gameplay Flow
 1. Players in hub bucket 0.
-2. Use the **radial menu** to create/invite/leave/kick party, start solo/party raids, open skills, and manage character actions.
+2. Use the **radial menu** to create/invite/leave/kick party, start solo/party raids, open skills, and manage character actions. The hub also contains a safezone and vendor NPCs.
 3. Start solo or leader-started party raid.
 4. Raid assigns routing bucket = raidId, teleports to insertion, creates per-player stash (`raid:<raidId>:<citizenid>`).
 5. Loot from containers goes to raid stash only (Found In Raid), including weapon/ammo metadata.
