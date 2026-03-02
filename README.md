@@ -82,6 +82,7 @@ Alternative (same content):
 
 
 - Recipe action names were normalized to txAdmin snake_case (`download_github`, `copy_path`, `replace_string`, `query_database`, `remove_path`) for compatibility with builds that reject camelCase actions.
+- Recipe now avoids `replace_string` tasks for broad txAdmin compatibility; it copies a ready `server.cfg` stub and you can edit hostname/license/mysql after install.
 
 When running the recipe, set:
 - `zrpRepoUrl` => `https://github.com/toxiikhazard-maker/fivemscripts`

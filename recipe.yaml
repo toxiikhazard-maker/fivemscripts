@@ -77,28 +77,8 @@ tasks:
     src: ./tmp/zrp/sql/zrp_schema.sql
     dest: ./zrp_schema.sql
   - action: copy_path
-    src: ./tmp/zrp/template/fxserver/server.cfg.template
+    src: ./tmp/zrp/template/txadmin/server.cfg.recipe
     dest: ./server.cfg
-  - action: replace_string
-    file: ./server.cfg
-    find: "{{SERVER_NAME}}"
-    replace: "{{serverName}}"
-  - action: replace_string
-    file: ./server.cfg
-    find: "{{MAX_CLIENTS}}"
-    replace: "{{maxClients}}"
-  - action: replace_string
-    file: ./server.cfg
-    find: "{{STEAM_WEB_API_KEY}}"
-    replace: "{{steamWebApiKey}}"
-  - action: replace_string
-    file: ./server.cfg
-    find: "{{LICENSE_KEY}}"
-    replace: "{{licenseKey}}"
-  - action: replace_string
-    file: ./server.cfg
-    find: "{{MYSQL_CONNECTION}}"
-    replace: "{{mysqlConnection}}"
   - action: query_database
     file: ./zrp_schema.sql
   - action: remove_path
