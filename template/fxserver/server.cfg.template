@@ -1,0 +1,48 @@
+# =========================
+# ZRP Extraction PvE Template
+# =========================
+sv_hostname "{{SERVER_NAME}}"
+sv_maxclients {{MAX_CLIENTS}}
+set steam_webApiKey "{{STEAM_WEB_API_KEY}}"
+sv_licenseKey "{{LICENSE_KEY}}"
+
+# Locale / OneSync
+sets locale "en-US"
+set onesync on
+
+# Endpoints (edit for production)
+endpoint_add_tcp "0.0.0.0:30120"
+endpoint_add_udp "0.0.0.0:30120"
+
+# DB
+set mysql_connection_string "{{MYSQL_CONNECTION}}"
+
+# Basic server tags
+sets tags "rp, qbcore, pve, zombies, extraction"
+sets sv_projectName "{{SERVER_NAME}}"
+sets sv_projectDesc "QBCore Extraction PvE Zombies"
+load_server_icon myLogo.png
+
+# Admins (example)
+add_ace group.admin command allow
+add_principal identifier.fivem:1 group.admin
+
+# Recommended
+setr voice_useNativeAudio true
+setr voice_useSendingRangeOnly true
+
+# Core dependencies
+ensure oxmysql
+ensure ox_lib
+ensure qb-core
+ensure ox_inventory
+
+# ZRP load order
+ensure zrp_core
+ensure zrp_party
+ensure zrp_inventory
+ensure zrp_contracts
+ensure zrp_raids
+ensure zrp_zombies
+ensure zrp_extract
+ensure zrp_ui
