@@ -80,6 +80,8 @@ Alternative (same content):
 `https://raw.githubusercontent.com/<owner>/<repo>/<branch>/template/txadmin/recipe.yaml`
 
 
+- Recipe action names were normalized to txAdmin snake_case (`download_github`, `copy_path`, `replace_string`, `query_database`, `remove_path`) for compatibility with builds that reject camelCase actions.
+
 When running the recipe, set:
 - `zrpRepoUrl` => `https://github.com/<owner>/<repo>`
 - `zrpRepoRef` => your branch/tag (for example `main`)
