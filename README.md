@@ -81,8 +81,10 @@ Alternative (same content):
 `https://raw.githubusercontent.com/toxiikhazard-maker/fivemscripts/main/template/txadmin/recipe.yaml`
 
 
-- Recipe action names were normalized to txAdmin snake_case (`download_github`, `copy_path`, `replace_string`, `query_database`, `remove_path`) for compatibility with builds that reject camelCase actions.
+- Recipe action names were normalized to txAdmin snake_case (`download_github`, `copy_path`, `replace_string`, `remove_path`) for compatibility with builds that reject camelCase actions.
 - Recipe now avoids `replace_string` tasks for broad txAdmin compatibility; it copies a ready `server.cfg` stub and you can edit hostname/license/mysql after install.
+- Recipe now copies `zrp_schema.sql` but does not auto-run DB import (avoids deploy failures when txAdmin has no active DB connection in recipe runner).
+- After deploy, import manually: `source zrp_schema.sql` (or run the SQL in your DB tool).
 
 When running the recipe:
 - Repository and dependency download links are hardcoded in the recipe for maximum txAdmin compatibility.
@@ -131,3 +133,4 @@ When running the recipe:
 - **Inventory/loot interactions fail**: verify `ox_inventory` and `oxmysql` are both started and database import completed.
 - **Character appearance does not load**: confirm only one appearance system is active (`illenium-appearance` or `fivem-appearance`) and not both.
 - **txAdmin recipe reports invalid YAML**: use the raw recipe URL shown above, not the GitHub web page URL.
+- **`query_database` failed / `Database connection not found` in txAdmin deployer**: expected on some txAdmin setups; import `zrp_schema.sql` manually after deployment.
