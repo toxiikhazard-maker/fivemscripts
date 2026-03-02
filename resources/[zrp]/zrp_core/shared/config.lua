@@ -1,10 +1,9 @@
 ZRPConfig = {}
 
-ZRPConfig.Version = '1.1.0'
+ZRPConfig.Version = '1.2.0'
 ZRPConfig.MaxPartySize = 4
 ZRPConfig.ReadyCheckTimeout = 30
 ZRPConfig.RaidDurationLimit = 3600
-
 
 ZRPConfig.Character = {
     MultiCharacter = {
@@ -18,6 +17,55 @@ ZRPConfig.Character = {
         providers = {
             illenium = true,
             fivemAppearance = true
+        }
+    }
+}
+
+ZRPConfig.Hub = {
+    Safezone = {
+        center = vec3(-548.72, -201.31, 38.22),
+        radius = 90.0,
+        disableWeapons = true,
+        invincible = true
+    },
+    Vendors = {
+        {
+            id = 'hub_quartermaster',
+            label = 'Quartermaster',
+            ped = 's_m_m_armoured_02',
+            coords = vec4(-552.91, -195.25, 38.22, 180.0),
+            interactionDistance = 2.0,
+            stock = {
+                buy = {
+                    { item = 'bandage', price = 50, amount = 1 },
+                    { item = 'water_bottle', price = 20, amount = 1 },
+                    { item = 'lockpick', price = 180, amount = 1 },
+                    { item = 'pistol_ammo', price = 90, amount = 24 }
+                },
+                sell = {
+                    { item = 'repairkit', price = 120, amount = 1 },
+                    { item = 'radio', price = 70, amount = 1 },
+                    { item = 'advancedlockpick', price = 250, amount = 1 }
+                }
+            }
+        },
+        {
+            id = 'hub_medic',
+            label = 'Medic Supplier',
+            ped = 's_f_y_scrubs_01',
+            coords = vec4(-544.55, -206.01, 38.22, 15.0),
+            interactionDistance = 2.0,
+            stock = {
+                buy = {
+                    { item = 'medikit', price = 250, amount = 1 },
+                    { item = 'ifaks', price = 180, amount = 1 },
+                    { item = 'armor_plate_light', price = 600, amount = 1 }
+                },
+                sell = {
+                    { item = 'medic_jacket', price = 350, amount = 1 },
+                    { item = 'combat_uniform', price = 200, amount = 1 }
+                }
+            }
         }
     }
 }

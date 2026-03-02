@@ -1,5 +1,59 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local Config = ZRPConfig
+local runtimeOverridePath = 'data/runtime_overrides.json'
+
+local function isAdmin(src)
+    if src == 0 then return true end
+    if QBCore.Functions.HasPermission(src, 'admin') or QBCore.Functions.HasPermission(src, 'god') then
+        return true
+    end
+    return IsPlayerAceAllowed(src, 'command') or IsPlayerAceAllowed(src, 'zrp.admin')
+end
+
+local function deepMerge(base, override)
+    for k, v in pairs(override or {}) do
+        if type(v) == 'table' and type(base[k]) == 'table' then
+            deepMerge(base[k], v)
+        else
+            base[k] = v
+        end
+    end
+end
+
+local function loadRuntimeOverrides()
+    local raw = LoadResourceFile(GetCurrentResourceName(), runtimeOverridePath)
+    if not raw or raw == '' then return end
+    local ok, decoded = pcall(json.decode, raw)
+    if ok and type(decoded) == 'table' then
+        deepMerge(Config, decoded)
+    end
+end
+
+local function saveRuntimeOverrides(override)
+    SaveResourceFile(GetCurrentResourceName(), runtimeOverridePath, json.encode(override, { indent = true }), -1)
+end
+
+local function setByPath(tbl, path, value)
+    local target = tbl
+    for i = 1, #path - 1 do
+        local key = path[i]
+        if type(target[key]) ~= 'table' then target[key] = {} end
+        target = target[key]
+    end
+    target[path[#path]] = value
+end
+
+local runtimeOverrides = {}
+do
+    local raw = LoadResourceFile(GetCurrentResourceName(), runtimeOverridePath)
+    if raw and raw ~= '' then
+        local ok, decoded = pcall(json.decode, raw)
+        if ok and type(decoded) == 'table' then
+            runtimeOverrides = decoded
+        end
+    end
+    loadRuntimeOverrides()
+end
 
 local function ensurePlayerRow(citizenid)
     local row = MySQL.single.await('SELECT citizenid FROM zrp_players WHERE citizenid = ?', { citizenid })
@@ -256,4 +310,91 @@ end)
 
 exports('GetConfig', function()
     return ZRPConfig
+end)
+
+lib.callback.register('zrp_core:server:getAdminPanelData', function(source)
+    if not isAdmin(source) then return nil end
+    return {
+        hub = Config.Hub,
+        threat = Config.Threat,
+        extraction = Config.Extraction,
+        contracts = Config.Contracts,
+        zones = Config.Zones,
+        maxParty = Config.MaxPartySize
+    }
+end)
+
+RegisterNetEvent('zrp_core:server:adminSetConfigPath', function(pathKey, value)
+    local src = source
+    if not isAdmin(src) then return end
+    if type(pathKey) ~= 'string' or pathKey == '' then return end
+
+    local path = {}
+    for segment in string.gmatch(pathKey, '[^%.]+') do
+        path[#path + 1] = segment
+    end
+    if #path == 0 then return end
+
+    setByPath(Config, path, value)
+    setByPath(runtimeOverrides, path, value)
+    saveRuntimeOverrides(runtimeOverrides)
+    TriggerClientEvent('zrp_core:client:notify', src, ('Updated config: %s'):format(pathKey), 'success')
+end)
+
+RegisterNetEvent('zrp_core:server:adminAddVendor', function(vendor)
+    local src = source
+    if not isAdmin(src) then return end
+    if type(vendor) ~= 'table' or not vendor.id or not vendor.label or not vendor.coords then return end
+
+    Config.Hub.Vendors = Config.Hub.Vendors or {}
+    Config.Hub.Vendors[#Config.Hub.Vendors + 1] = vendor
+
+    runtimeOverrides.Hub = runtimeOverrides.Hub or {}
+    runtimeOverrides.Hub.Vendors = Config.Hub.Vendors
+    saveRuntimeOverrides(runtimeOverrides)
+    TriggerClientEvent('zrp_core:client:notify', src, ('Vendor added: %s'):format(vendor.label), 'success')
+end)
+
+RegisterNetEvent('zrp_core:server:adminAddContract', function(contract)
+    local src = source
+    if not isAdmin(src) then return end
+    if type(contract) ~= 'table' or not contract.id or not contract.label or not contract.type or not contract.required then return end
+
+    contract.reward = contract.reward or { cash = 0, xp = 0, rep = 0 }
+    Config.Contracts[contract.id] = contract
+
+    runtimeOverrides.Contracts = runtimeOverrides.Contracts or {}
+    runtimeOverrides.Contracts[contract.id] = contract
+    saveRuntimeOverrides(runtimeOverrides)
+    TriggerClientEvent('zrp_core:client:notify', src, ('Contract added: %s'):format(contract.id), 'success')
+end)
+
+RegisterNetEvent('zrp_core:server:adminRemoveVendor', function(vendorId)
+    local src = source
+    if not isAdmin(src) then return end
+    if type(vendorId) ~= 'string' then return end
+
+    local nextList = {}
+    for _, v in ipairs(Config.Hub.Vendors or {}) do
+        if v.id ~= vendorId then nextList[#nextList + 1] = v end
+    end
+    Config.Hub.Vendors = nextList
+
+    runtimeOverrides.Hub = runtimeOverrides.Hub or {}
+    runtimeOverrides.Hub.Vendors = nextList
+    saveRuntimeOverrides(runtimeOverrides)
+    TriggerClientEvent('zrp_core:client:notify', src, ('Vendor removed: %s'):format(vendorId), 'success')
+end)
+
+RegisterNetEvent('zrp_core:server:adminRemoveContract', function(contractId)
+    local src = source
+    if not isAdmin(src) then return end
+    if type(contractId) ~= 'string' then return end
+
+    Config.Contracts[contractId] = nil
+
+    runtimeOverrides.Contracts = runtimeOverrides.Contracts or {}
+    runtimeOverrides.Contracts[contractId] = nil
+    saveRuntimeOverrides(runtimeOverrides)
+    TriggerClientEvent('zrp_core:client:notify', src, ('Contract removed: %s'):format(contractId), 'success')
 end)

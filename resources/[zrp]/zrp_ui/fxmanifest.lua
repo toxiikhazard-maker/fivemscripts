@@ -18,6 +18,8 @@ server_scripts {
 }
 
 dependencies {
+    'qb-core',
+    'ox_inventory',
     'zrp_core',
     'zrp_party',
     'zrp_raids',
