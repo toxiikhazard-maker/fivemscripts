@@ -110,8 +110,122 @@ local function openSkillsMenu()
     lib.showContext('zrp_skills_menu')
 end
 
+local function openAdminPanel()
+    local data = lib.callback.await('zrp_core:server:getAdminPanelData', false)
+    if not data then
+        TriggerEvent('zrp_core:client:notify', 'Admin permissions required.', 'error')
+        return
+    end
+
+    lib.registerContext({
+        id = 'zrp_admin_panel',
+        title = 'ZRP Admin Panel',
+        options = {
+            {
+                title = 'Set Max Party Size',
+                onSelect = function()
+                    local input = lib.inputDialog('Set Max Party Size', { { type = 'number', label = 'Value', required = true, default = data.maxParty or 4 } })
+                    if input and input[1] then
+                        TriggerServerEvent('zrp_core:server:adminSetConfigPath', 'MaxPartySize', tonumber(input[1]))
+                    end
+                end
+            },
+            {
+                title = 'Set Safezone Radius',
+                onSelect = function()
+                    local input = lib.inputDialog('Set Safezone Radius', { { type = 'number', label = 'Radius', required = true, default = data.hub and data.hub.Safezone and data.hub.Safezone.radius or 90.0 } })
+                    if input and input[1] then
+                        TriggerServerEvent('zrp_core:server:adminSetConfigPath', 'Hub.Safezone.radius', tonumber(input[1]))
+                    end
+                end
+            },
+            {
+                title = 'Set Threat Gunshot Value',
+                onSelect = function()
+                    local input = lib.inputDialog('Set Threat.Gunshot', { { type = 'number', label = 'Gunshot Threat', required = true, default = data.threat and data.threat.Gunshot or 4 } })
+                    if input and input[1] then
+                        TriggerServerEvent('zrp_core:server:adminSetConfigPath', 'Threat.Gunshot', tonumber(input[1]))
+                    end
+                end
+            },
+            {
+                title = 'Add Vendor',
+                onSelect = function()
+                    local input = lib.inputDialog('Add Vendor', {
+                        { type = 'input', label = 'Vendor ID', required = true },
+                        { type = 'input', label = 'Label', required = true },
+                        { type = 'input', label = 'Ped Model', required = true, default = 's_m_m_armoured_02' },
+                        { type = 'number', label = 'X', required = true },
+                        { type = 'number', label = 'Y', required = true },
+                        { type = 'number', label = 'Z', required = true },
+                        { type = 'number', label = 'Heading', required = true, default = 0.0 }
+                    })
+                    if not input then return end
+                    TriggerServerEvent('zrp_core:server:adminAddVendor', {
+                        id = tostring(input[1]),
+                        label = tostring(input[2]),
+                        ped = tostring(input[3]),
+                        coords = vec4(tonumber(input[4]), tonumber(input[5]), tonumber(input[6]), tonumber(input[7])),
+                        interactionDistance = 2.0,
+                        stock = { buy = {}, sell = {} }
+                    })
+                end
+            },
+            {
+                title = 'Remove Vendor',
+                onSelect = function()
+                    local input = lib.inputDialog('Remove Vendor', { { type = 'input', label = 'Vendor ID', required = true } })
+                    if input and input[1] then
+                        TriggerServerEvent('zrp_core:server:adminRemoveVendor', tostring(input[1]))
+                    end
+                end
+            },
+            {
+                title = 'Add Contract',
+                onSelect = function()
+                    local input = lib.inputDialog('Add Contract', {
+                        { type = 'input', label = 'Contract ID', required = true },
+                        { type = 'input', label = 'Label', required = true },
+                        { type = 'select', label = 'Type', options = {
+                            { value = 'collect', label = 'collect' },
+                            { value = 'kill', label = 'kill' },
+                            { value = 'kill_special', label = 'kill_special' },
+                            { value = 'activate', label = 'activate' },
+                            { value = 'defend', label = 'defend' }
+                        }, required = true },
+                        { type = 'number', label = 'Required', required = true, default = 5 },
+                        { type = 'number', label = 'Cash Reward', required = true, default = 1000 },
+                        { type = 'number', label = 'XP Reward', required = true, default = 100 },
+                        { type = 'number', label = 'REP Reward', required = true, default = 10 }
+                    })
+                    if not input then return end
+                    TriggerServerEvent('zrp_core:server:adminAddContract', {
+                        id = tostring(input[1]),
+                        label = tostring(input[2]),
+                        type = tostring(input[3]),
+                        required = tonumber(input[4]),
+                        reward = { cash = tonumber(input[5]), xp = tonumber(input[6]), rep = tonumber(input[7]) },
+                        extractionGated = true
+                    })
+                end
+            },
+            {
+                title = 'Remove Contract',
+                onSelect = function()
+                    local input = lib.inputDialog('Remove Contract', { { type = 'input', label = 'Contract ID', required = true } })
+                    if input and input[1] then
+                        TriggerServerEvent('zrp_core:server:adminRemoveContract', tostring(input[1]))
+                    end
+                end
+            }
+        }
+    })
+    lib.showContext('zrp_admin_panel')
+end
+
 RegisterNetEvent('zrp_core:client:openSkillsMenu', openSkillsMenu)
 RegisterCommand('zrp_skills', openSkillsMenu)
+RegisterCommand('zrp_admin', openAdminPanel)
 
 RegisterCommand(ZRPConfig.Character.Customization.command, function()
     openCustomization()

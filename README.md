@@ -24,6 +24,7 @@
 - **Radial menu (ox_lib radial, default keybind F1)** for party, raid, skills, customization, and character actions.
 - `/zrp_menu` (fallback helper; reminds players to use radial menu).
 - `/raid_stash` (open your current raid stash).
+- `/zrp_admin` (admin panel to edit runtime config, vendors, and contracts).
 
 ## Legacy Admin/Debug Commands (still available)
 - `/zrp_skills`
@@ -87,6 +88,11 @@ When running the recipe, set:
 - `zrpRepoRef` => your branch/tag (for example `main`)
 
 ## Added Systems
+- **Admin Panel (runtime config editor)**:
+  - Change core runtime values (party size, safezone radius, threat values).
+  - Add/remove vendors quickly in-game.
+  - Add/remove contracts (quests) in-game.
+  - Saves overrides to `resources/[zrp]/zrp_core/data/runtime_overrides.json`.
 - **Hub safezone + vendors**:
   - Configured safezone in hub with weapon disable/invulnerability while inside.
   - Two example vendors (Quartermaster + Medic Supplier) with buy/sell lists via ox_inventory + cash economy.

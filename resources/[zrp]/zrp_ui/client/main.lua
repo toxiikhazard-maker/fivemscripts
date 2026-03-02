@@ -176,6 +176,12 @@ local function registerRadial()
             label = 'Switch Character',
             icon = 'right-left',
             onSelect = function() ExecuteCommand(ZRPConfig.Character.MultiCharacter.switchCommand) end
+        },
+        {
+            id = 'zrp_adminpanel',
+            label = 'Admin Panel',
+            icon = 'gear',
+            onSelect = function() ExecuteCommand('zrp_admin') end
         }
     })
 end

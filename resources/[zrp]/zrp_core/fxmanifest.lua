@@ -13,6 +13,10 @@ shared_scripts {
     'shared/config.lua'
 }
 
+files {
+    'data/runtime_overrides.json'
+}
+
 client_scripts {
     'client/main.lua'
 }
