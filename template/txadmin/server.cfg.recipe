@@ -1,0 +1,40 @@
+# =========================
+# ZRP Extraction PvE Recipe Server CFG
+# =========================
+sv_hostname "ZRP Extraction PvE"
+sv_maxclients 32
+set steam_webApiKey ""
+sv_licenseKey "change_me"
+
+sets locale "en-US"
+set onesync on
+
+endpoint_add_tcp "0.0.0.0:30120"
+endpoint_add_udp "0.0.0.0:30120"
+
+set mysql_connection_string "mysql://fivem:password@127.0.0.1/fivem?charset=utf8mb4"
+
+sets tags "rp, qbcore, pve, zombies, extraction"
+sets sv_projectName "ZRP Extraction PvE"
+sets sv_projectDesc "QBCore Extraction PvE Zombies"
+load_server_icon myLogo.png
+
+add_ace group.admin command allow
+add_principal identifier.fivem:1 group.admin
+
+setr voice_useNativeAudio true
+setr voice_useSendingRangeOnly true
+
+ensure oxmysql
+ensure ox_lib
+ensure qb-core
+ensure ox_inventory
+
+ensure zrp_core
+ensure zrp_party
+ensure zrp_inventory
+ensure zrp_contracts
+ensure zrp_raids
+ensure zrp_zombies
+ensure zrp_extract
+ensure zrp_ui

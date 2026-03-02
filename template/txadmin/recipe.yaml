@@ -1,0 +1,85 @@
+$engine: 3
+name: ZRP Extraction PvE Full Bootstrap (QBCore + ox_inventory)
+author: zrp
+version: 1.3
+description: txAdmin recipe that installs ZRP plus required core dependencies.
+variables:
+  - name: zrpRepoUrl
+    description: ZRP repository URL
+    default: https://github.com/toxiikhazard-maker/fivemscripts
+  - name: zrpRepoRef
+    description: ZRP git ref
+    default: main
+  - name: serverName
+    description: Server name used in server.cfg
+    default: ZRP Extraction PvE
+  - name: maxClients
+    description: Max clients
+    default: "32"
+  - name: steamWebApiKey
+    description: Steam API key
+    default: ""
+  - name: licenseKey
+    description: FiveM license key
+    default: change_me
+  - name: mysqlConnection
+    description: oxmysql connection string
+    default: mysql://fivem:password@127.0.0.1/fivem?charset=utf8mb4
+  - name: qbCoreRef
+    description: qb-core git ref
+    default: main
+  - name: oxmysqlRef
+    description: oxmysql git ref
+    default: main
+  - name: oxlibRef
+    description: ox_lib git ref
+    default: master
+  - name: oxInventoryRef
+    description: ox_inventory git ref
+    default: main
+tasks:
+  - action: download_github
+    src: "{{zrpRepoUrl}}"
+    ref: "{{zrpRepoRef}}"
+    dest: ./tmp/zrp
+  - action: download_github
+    src: https://github.com/qbcore-framework/qb-core
+    ref: "{{qbCoreRef}}"
+    dest: ./tmp/qb-core
+  - action: download_github
+    src: https://github.com/overextended/oxmysql
+    ref: "{{oxmysqlRef}}"
+    dest: ./tmp/oxmysql
+  - action: download_github
+    src: https://github.com/overextended/ox_lib
+    ref: "{{oxlibRef}}"
+    dest: ./tmp/ox_lib
+  - action: download_github
+    src: https://github.com/overextended/ox_inventory
+    ref: "{{oxInventoryRef}}"
+    dest: ./tmp/ox_inventory
+  - action: copy_path
+    src: ./tmp/qb-core
+    dest: ./resources/[core]/qb-core
+  - action: copy_path
+    src: ./tmp/oxmysql
+    dest: ./resources/[ox]/oxmysql
+  - action: copy_path
+    src: ./tmp/ox_lib
+    dest: ./resources/[ox]/ox_lib
+  - action: copy_path
+    src: ./tmp/ox_inventory
+    dest: ./resources/[ox]/ox_inventory
+  - action: copy_path
+    src: ./tmp/zrp/resources/[zrp]
+    dest: ./resources/[zrp]
+  - action: copy_path
+    src: ./tmp/zrp/sql/zrp_schema.sql
+    dest: ./zrp_schema.sql
+  - action: copy_path
+    src: ./tmp/zrp/template/txadmin/server.cfg.recipe
+    dest: ./server.cfg
+  - action: query_database
+    file: ./zrp_schema.sql
+  - action: remove_path
+    path: ./tmp
