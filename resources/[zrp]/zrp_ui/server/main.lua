@@ -81,7 +81,7 @@ RegisterNetEvent('zrp_ui:server:vendorBuy', function(vendorId, itemName)
     if price <= 0 or amount <= 0 then return end
 
     if Player.Functions.RemoveMoney('cash', price, 'zrp-vendor-buy') then
-        local ok = exports.ox_inventory:AddItem(src, listing.item, amount, { vendor = vendorId })
+        local ok = exports['zrp_inventory']:AddItemToPlayer(src, listing.item, amount, { vendor = vendorId })
         if ok then
             TriggerClientEvent('zrp_core:client:notify', src, ('Purchased %sx %s'):format(amount, listing.item), 'success')
         else
@@ -111,7 +111,7 @@ RegisterNetEvent('zrp_ui:server:vendorSell', function(vendorId, itemName)
     local amount = tonumber(listing.amount) or 1
     if price <= 0 or amount <= 0 then return end
 
-    local removed = exports.ox_inventory:RemoveItem(src, listing.item, amount)
+    local removed = exports['zrp_inventory']:RemoveItemFromPlayer(src, listing.item, amount)
     if removed then
         Player.Functions.AddMoney('cash', price, 'zrp-vendor-sell')
         TriggerClientEvent('zrp_core:client:notify', src, ('Sold %sx %s'):format(amount, listing.item), 'success')

@@ -99,6 +99,7 @@ When running the recipe:
 - **Hub safezone + vendors**:
   - Configured safezone in hub with weapon disable/invulnerability while inside.
   - Two example vendors (Quartermaster + Medic Supplier) with buy/sell lists via ox_inventory + cash economy.
+- **Inventory bridge (`zrp_inventory`)**: framework-facing exports now wrap `ox_inventory` operations (`AddItemToPlayer`, `RemoveItemFromPlayer`, raid stash lifecycle) so other ZRP resources do not call `ox_inventory` directly.
 - **Weapon attachments**: weapon loot can roll random attachment metadata.
 - **Ammo types**: ammo loot rolls FMJ/AP/Incendiary/etc metadata with stat multipliers.
 - **Armor and clothing perks**: armor/clothing items grant passive buffs (armor, sprint, mitigation).

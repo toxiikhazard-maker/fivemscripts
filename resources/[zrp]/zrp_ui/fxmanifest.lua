@@ -19,8 +19,8 @@ server_scripts {
 
 dependencies {
     'qb-core',
-    'ox_inventory',
     'zrp_core',
+    'zrp_inventory',
     'zrp_party',
     'zrp_raids',
     'zrp_contracts'
