@@ -84,9 +84,9 @@ Alternative (same content):
 - Recipe action names were normalized to txAdmin snake_case (`download_github`, `copy_path`, `replace_string`, `query_database`, `remove_path`) for compatibility with builds that reject camelCase actions.
 - Recipe now avoids `replace_string` tasks for broad txAdmin compatibility; it copies a ready `server.cfg` stub and you can edit hostname/license/mysql after install.
 
-When running the recipe, set:
-- `zrpRepoUrl` => `https://github.com/toxiikhazard-maker/fivemscripts`
-- `zrpRepoRef` => your branch/tag (for example `main`)
+When running the recipe:
+- Repository and dependency download links are hardcoded in the recipe for maximum txAdmin compatibility.
+- If you need a fork/branch, edit `recipe.yaml` (or `template/txadmin/recipe.yaml`) directly before importing.
 
 ## Added Systems
 - **Admin Panel (runtime config editor)**:
@@ -125,3 +125,9 @@ When running the recipe, set:
 - PvE only design.
 - Zombie pressure scales with threat + party size.
 - Threat increases from sprinting, gunfire, and looting.
+
+## Troubleshooting
+- **`@ox_lib/init.lua` not found**: ensure `ox_lib` starts before all ZRP resources in `server.cfg`.
+- **Inventory/loot interactions fail**: verify `ox_inventory` and `oxmysql` are both started and database import completed.
+- **Character appearance does not load**: confirm only one appearance system is active (`illenium-appearance` or `fivem-appearance`) and not both.
+- **txAdmin recipe reports invalid YAML**: use the raw recipe URL shown above, not the GitHub web page URL.
