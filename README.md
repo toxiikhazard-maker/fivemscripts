@@ -24,6 +24,7 @@
 - **Radial menu (ox_lib radial, default keybind F1)** for party, raid, skills, customization, and character actions.
 - `/zrp_menu` (fallback helper; reminds players to use radial menu).
 - `/raid_stash` (open your current raid stash).
+- `/zrp_admin` (admin panel to edit runtime config, vendors, and contracts).
 
 ## Legacy Admin/Debug Commands (still available)
 - `/zrp_skills`
@@ -74,17 +75,27 @@ If txAdmin says `invalid yaml`, most often the URL is not the raw file.
 Use a **raw file URL** (not the GitHub HTML page).
 
 Recommended (root recipe):
-`https://raw.githubusercontent.com/<owner>/<repo>/<branch>/recipe.yaml`
+`https://raw.githubusercontent.com/toxiikhazard-maker/fivemscripts/main/recipe.yaml`
 
 Alternative (same content):
-`https://raw.githubusercontent.com/<owner>/<repo>/<branch>/template/txadmin/recipe.yaml`
+`https://raw.githubusercontent.com/toxiikhazard-maker/fivemscripts/main/template/txadmin/recipe.yaml`
 
+
+- Recipe action names were normalized to txAdmin snake_case (`download_github`, `copy_path`, `replace_string`, `query_database`, `remove_path`) for compatibility with builds that reject camelCase actions.
 
 When running the recipe, set:
-- `zrpRepoUrl` => `https://github.com/<owner>/<repo>`
+- `zrpRepoUrl` => `https://github.com/toxiikhazard-maker/fivemscripts`
 - `zrpRepoRef` => your branch/tag (for example `main`)
 
 ## Added Systems
+- **Admin Panel (runtime config editor)**:
+  - Change core runtime values (party size, safezone radius, threat values).
+  - Add/remove vendors quickly in-game.
+  - Add/remove contracts (quests) in-game.
+  - Saves overrides to `resources/[zrp]/zrp_core/data/runtime_overrides.json`.
+- **Hub safezone + vendors**:
+  - Configured safezone in hub with weapon disable/invulnerability while inside.
+  - Two example vendors (Quartermaster + Medic Supplier) with buy/sell lists via ox_inventory + cash economy.
 - **Weapon attachments**: weapon loot can roll random attachment metadata.
 - **Ammo types**: ammo loot rolls FMJ/AP/Incendiary/etc metadata with stat multipliers.
 - **Armor and clothing perks**: armor/clothing items grant passive buffs (armor, sprint, mitigation).
@@ -101,7 +112,7 @@ When running the recipe, set:
 
 ## Gameplay Flow
 1. Players in hub bucket 0.
-2. Use the **radial menu** to create/invite/leave/kick party, start solo/party raids, open skills, and manage character actions.
+2. Use the **radial menu** to create/invite/leave/kick party, start solo/party raids, open skills, and manage character actions. The hub also contains a safezone and vendor NPCs.
 3. Start solo or leader-started party raid.
 4. Raid assigns routing bucket = raidId, teleports to insertion, creates per-player stash (`raid:<raidId>:<citizenid>`).
 5. Loot from containers goes to raid stash only (Found In Raid), including weapon/ammo metadata.

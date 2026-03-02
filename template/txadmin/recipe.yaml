@@ -6,7 +6,7 @@ description: txAdmin recipe that installs ZRP plus required core dependencies.
 variables:
   - name: zrpRepoUrl
     description: ZRP repository URL
-    default: https://github.com/REPLACE_ME/REPLACE_REPO
+    default: https://github.com/toxiikhazard-maker/fivemscripts
   - name: zrpRepoRef
     description: ZRP git ref
     default: main
@@ -38,61 +38,68 @@ variables:
     description: ox_inventory git ref
     default: main
 tasks:
-  - action: downloadGitHub
+  - action: download_github
     src: "{{zrpRepoUrl}}"
     ref: "{{zrpRepoRef}}"
     dest: ./tmp/zrp
-  - action: downloadGitHub
+  - action: download_github
     src: https://github.com/qbcore-framework/qb-core
     ref: "{{qbCoreRef}}"
     dest: ./tmp/qb-core
-  - action: downloadGitHub
+  - action: download_github
     src: https://github.com/overextended/oxmysql
     ref: "{{oxmysqlRef}}"
     dest: ./tmp/oxmysql
-  - action: downloadGitHub
+  - action: download_github
     src: https://github.com/overextended/ox_lib
     ref: "{{oxlibRef}}"
     dest: ./tmp/ox_lib
-  - action: downloadGitHub
+  - action: download_github
     src: https://github.com/overextended/ox_inventory
     ref: "{{oxInventoryRef}}"
     dest: ./tmp/ox_inventory
-  - action: copyPath
+  - action: copy_path
     src: ./tmp/qb-core
     dest: ./resources/[core]/qb-core
-  - action: copyPath
+  - action: copy_path
     src: ./tmp/oxmysql
     dest: ./resources/[ox]/oxmysql
-  - action: copyPath
+  - action: copy_path
     src: ./tmp/ox_lib
     dest: ./resources/[ox]/ox_lib
-  - action: copyPath
+  - action: copy_path
     src: ./tmp/ox_inventory
     dest: ./resources/[ox]/ox_inventory
-  - action: copyPath
+  - action: copy_path
     src: ./tmp/zrp/resources/[zrp]
     dest: ./resources/[zrp]
-  - action: copyPath
+  - action: copy_path
     src: ./tmp/zrp/sql/zrp_schema.sql
     dest: ./zrp_schema.sql
-  - action: copyPath
+  - action: copy_path
     src: ./tmp/zrp/template/fxserver/server.cfg.template
     dest: ./server.cfg
-  - action: replaceInFile
-    path: ./server.cfg
-    replacements:
-      - from: "{{SERVER_NAME}}"
-        to: "{{serverName}}"
-      - from: "{{MAX_CLIENTS}}"
-        to: "{{maxClients}}"
-      - from: "{{STEAM_WEB_API_KEY}}"
-        to: "{{steamWebApiKey}}"
-      - from: "{{LICENSE_KEY}}"
-        to: "{{licenseKey}}"
-      - from: "{{MYSQL_CONNECTION}}"
-        to: "{{mysqlConnection}}"
-  - action: queryDatabase
+  - action: replace_string
+    file: ./server.cfg
+    find: "{{SERVER_NAME}}"
+    replace: "{{serverName}}"
+  - action: replace_string
+    file: ./server.cfg
+    find: "{{MAX_CLIENTS}}"
+    replace: "{{maxClients}}"
+  - action: replace_string
+    file: ./server.cfg
+    find: "{{STEAM_WEB_API_KEY}}"
+    replace: "{{steamWebApiKey}}"
+  - action: replace_string
+    file: ./server.cfg
+    find: "{{LICENSE_KEY}}"
+    replace: "{{licenseKey}}"
+  - action: replace_string
+    file: ./server.cfg
+    find: "{{MYSQL_CONNECTION}}"
+    replace: "{{mysqlConnection}}"
+  - action: query_database
     file: ./zrp_schema.sql
-  - action: removePath
+  - action: remove_path
     path: ./tmp
